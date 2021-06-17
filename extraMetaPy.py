@@ -18,10 +18,11 @@ from colorama import Fore, Style
 parser = argparse.ArgumentParser(description=f'{Fore.RED}{Style.BRIGHT}extraMetaPy{Style.RESET_ALL}: The Python3 powered {Fore.YELLOW}google{Style.RESET_ALL} dorking and metadata extracting tool. Presented by {Fore.MAGENTA}Jessi{Style.RESET_ALL}.')
 
 parser.add_argument('-d', '--domain', help=f'Target domain {Fore.RED}{Style.BRIGHT}REQUIRED{Style.RESET_ALL}', default=None, required=True)
-parser.add_argument('-o', '--output', help=f'Output file name {Style.DIM}OPTIONAL Defualt: extracted_metadata.txt{Style.RESET_ALL}', default='extracted_metadata.txt', required=False)
-parser.add_argument('-f', '--filedir', help=f'Downloads directory {Style.DIM}OPTIONAL Default: file_downloads/{Style.RESET_ALL}', default='file_downloads/', required=False)
-parser.add_argument('-l', '--limit', type=int, help=f'Results limit {Style.DIM}OPTIONAL Default: 100{Style.RESET_ALL}', default=100, required=False)
-parser.add_argument('-u', '--urllist', help=f'URL List (Skips Google Dork task) {Style.DIM}OPTIONAL', default=None, required=False)
+parser.add_argument('-o', '--output', help=f'Output file name {Style.DIM}OPTIONAL (Defualt: extracted_metadata.txt){Style.RESET_ALL}', default='extracted_metadata.txt', required=False)
+parser.add_argument('-f', '--filedir', help=f'Downloads directory {Style.DIM}OPTIONAL (Default: file_downloads/){Style.RESET_ALL}', default='file_downloads/', required=False)
+parser.add_argument('-l', '--limit', type=int, help=f'Results limit {Style.DIM}OPTIONAL (Default: 100){Style.RESET_ALL}', default=100, required=False)
+parser.add_argument('-u', '--urllist', help=f'URL List (Skips Google Dork task) {Style.DIM}OPTIONAL{Style.RESET_ALL}', default=None, required=False)
+parser.add_argument('-nd', '--nodownload', help=f'Scrape only, skip downloading and metedata extratction {Style.DIM}OPTIONAL (Ex: -nd y){Style.RESET_ALL}', default='no', required=False)
 
 args = parser.parse_args()
 
@@ -32,6 +33,8 @@ output = args.output
 filedir = args.filedir
 limit = args.limit
 urllist = args.urllist
+if args.nodownload:
+    nodownload = 'yes'
 
 
 # Create filedir if not exists
@@ -133,6 +136,8 @@ if not urllist:
     urlsSum = sum(num is not None for num in urlsFile)
     print(f'{GREEN}{BRIGHT}[+] {NORM}{WHITE}Scraped {BRIGHT}{urlsSum}{NORM} URLs{RST}')
     print(f'{GREEN}{BRIGHT}[+] {NORM}{WHITE}Scraped URLs saved in {BRIGHT}urls.txt{RST}')
+    if nodownload == 'yes':
+        exit(1)
 else:
     urlsFile = open(urllist, 'r')
     urlsSum = sum(num is not None for num in urlsFile)
