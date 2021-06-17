@@ -15,7 +15,7 @@ from colorama import Fore, Style
 
 
 # Define parser and arguments.
-parser = argparse.ArgumentParser(description=f'extraMetaPy: The Python3 powered google dorking and metadata extracting tool. Presented by {Fore.MAGENTA}Jessi{Style.RESET_ALL}')
+parser = argparse.ArgumentParser(description=f'{Fore.RED}{Style.BRIGHT}extraMetaPy{Style.RESET_ALL}: The Python3 powered {Fore.YELLOW}google{Style.RESET_ALL} dorking and metadata extracting tool. Presented by {Fore.MAGENTA}Jessi{Style.RESET_ALL}.')
 
 parser.add_argument('-d', '--domain', help=f'Target domain {Fore.RED}{Style.BRIGHT}REQUIRED{Style.RESET_ALL}', default=None, required=True)
 parser.add_argument('-o', '--output', help=f'Output file name {Style.DIM}OPTIONAL Defualt: extracted_metadata.txt{Style.RESET_ALL}', default='extracted_metadata.txt', required=False)
