@@ -12,12 +12,13 @@ import urllib.request
 from googlesearch import search
 import colorama
 from colorama import Fore, Style
+from urllib.parse import urlparse
 
 
 # Define parser and arguments.
 parser = argparse.ArgumentParser(description=f'{Fore.RED}{Style.BRIGHT}extraMetaPy{Style.RESET_ALL}: The Python3 powered {Fore.YELLOW}google{Style.RESET_ALL} dorking and metadata extracting tool. Presented by {Fore.MAGENTA}Jessi{Style.RESET_ALL}.')
 
-parser.add_argument('-d', '--domain', help=f'Target domain {Fore.RED}{Style.BRIGHT}REQUIRED{Style.RESET_ALL}', default=None, required=True)
+parser.add_argument('-d', '--domain', help=f'Target domain {Fore.RED}{Style.BRIGHT}REQUIRED{Style.RESET_ALL} {Style.DIM}(Unless -u is supplied){Style.RESET_ALL}', default=None, required=False)
 parser.add_argument('-o', '--output', help=f'Output file name {Style.DIM}OPTIONAL (Defualt: extracted_metadata.txt){Style.RESET_ALL}', default='extracted_metadata.txt', required=False)
 parser.add_argument('-f', '--filedir', help=f'Downloads directory {Style.DIM}OPTIONAL (Default: file_downloads/){Style.RESET_ALL}', default='file_downloads/', required=False)
 parser.add_argument('-l', '--limit', type=int, help=f'Results limit {Style.DIM}OPTIONAL (Default: 100){Style.RESET_ALL}', default=100, required=False)
@@ -52,6 +53,17 @@ BRIGHT = Style.BRIGHT
 DIM = Style.DIM
 NORM = Style.NORMAL
 RST = Style.RESET_ALL
+
+
+# Display target domain
+if not urllist:
+    target = domain
+else:
+    urlData = open(urllist, 'r')
+    urlContent = urlData.readlines()
+    urlTarget = urlContent[1]
+    target = urlparse(urlTarget).netloc
+print(f'{PINK}{BRIGHT}[*] {NORM}{WHITE}Target domain: {BRIGHT}{target}{RST}')
 
 
 # Define fileTypes dictionary
