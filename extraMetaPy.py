@@ -23,7 +23,7 @@ parser.add_argument('-o', '--output', help=f'Output file name {Style.DIM}OPTIONA
 parser.add_argument('-f', '--filedir', help=f'Downloads directory {Style.DIM}OPTIONAL (Default: file_downloads/){Style.RESET_ALL}', default='file_downloads/', required=False)
 parser.add_argument('-l', '--limit', type=int, help=f'Results limit {Style.DIM}OPTIONAL (Default: 100){Style.RESET_ALL}', default=100, required=False)
 parser.add_argument('-u', '--urllist', help=f'URL List (Skips Google Dork task) {Style.DIM}OPTIONAL{Style.RESET_ALL}', default=None, required=False)
-parser.add_argument('-nd', '--nodownload', help=f'Scrape only, skip downloading and metedata extratction {Style.DIM}OPTIONAL (Ex: -nd y){Style.RESET_ALL}', default='no', required=False)
+parser.add_argument('-nd', '--nodownload', help=f'Scrape only, skip downloading and metedata extratction {Style.DIM}OPTIONAL (Ex: -nd y){Style.RESET_ALL}', default=None, required=False)
 
 args = parser.parse_args()
 
@@ -34,9 +34,7 @@ output = args.output
 filedir = args.filedir
 limit = args.limit
 urllist = args.urllist
-if args.nodownload:
-    nodownload = 'yes'
-
+nodownload = args.nodownload
 
 # Create filedir if not exists
 if not os.path.exists(filedir):
@@ -94,6 +92,8 @@ def download_url(url,filename): # Download files function
         print(f'{GREEN}{BRIGHT}[+]{NORM} {WHITE}Downloading: {BRIGHT}{url}{RST}')
     except urllib.error.HTTPError as exception:
         print(f'{RED}{BRIGHT}[x]{DIM} Download failed for:{RST} {WHITE}{url}{RST}')
+    except urllib.error.ContentTooShortError as exception:
+        print(f'{RED}{BRIGHT}[x]{DIM} Download failed for:{RST} {WHITE}{url}{RST}')
 
 
 class ExifTool(object): # Define ExifTool class
@@ -148,7 +148,7 @@ if not urllist:
     urlsSum = sum(num is not None for num in urlsFile)
     print(f'{GREEN}{BRIGHT}[+] {NORM}{WHITE}Scraped {BRIGHT}{urlsSum}{NORM} URLs{RST}')
     print(f'{GREEN}{BRIGHT}[+] {NORM}{WHITE}Scraped URLs saved in {BRIGHT}urls.txt{RST}')
-    if nodownload == 'yes':
+    if nodownload:
         exit(1)
 else:
     urlsFile = open(urllist, 'r')
