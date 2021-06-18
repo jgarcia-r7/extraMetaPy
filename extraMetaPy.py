@@ -5,6 +5,7 @@
 # REQUIRES EXIFTOOL INSTALLED (apt install libimage-exiftool-perl)
 
 import sys
+import apt
 import os
 import argparse
 import time
@@ -51,6 +52,25 @@ parser.add_argument('-u', '--urllist', help=f'URL List (Skips Google Dork task) 
 parser.add_argument('-nd', '--nodownload', help=f'Scrape only, skip downloading and metedata extratction {DIM}OPTIONAL (Ex: -nd y){RST}', default=None, required=False)
 
 args = parser.parse_args()
+
+
+# Check for exiftool installed
+cache = apt.Cache()
+if cache['libimage-exiftool-perl'].is_installed:
+    pass
+else:
+    print(f'{RED}{BRIGHT}[X] {WHITE}exiftool{NORM} is not installed')
+    exifInstall = input(f'Install {BRIGHT}exiftool{NORM}? (y/n){RST} ')
+    if exifInstall == 'y':
+        os.system('sudo apt update && sudo apt install libimage-exiftool-perl')
+        print(f'{GREEN}{BRIGHT}[+] {WHITE}exiftool {NORM}intalled, continuing{RST}')
+        time.sleep(2)
+    else:
+        if nodownload:
+            pass
+        else:
+            print(f'{BRIGHT}Google Dork mode{DIM} requires{RST} {BRIGHT}exiftool{DIM} installed')
+            exit(1)
 
 
 # Set args to variables
