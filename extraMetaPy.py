@@ -13,17 +13,31 @@ from googlesearch import search
 import colorama
 from colorama import Fore, Style
 from urllib.parse import urlparse
+from datetime import datetime
+
+
+# Define colorama colors
+GREEN = Fore.GREEN
+RED = Fore.RED
+WHITE = Fore.WHITE
+YELLOW = Fore.YELLOW
+CYAN = Fore.CYAN
+PINK = Fore.MAGENTA
+BRIGHT = Style.BRIGHT
+DIM = Style.DIM
+NORM = Style.NORMAL
+RST = Style.RESET_ALL
 
 
 # Define parser and arguments.
-parser = argparse.ArgumentParser(description=f'{Fore.RED}{Style.BRIGHT}extraMetaPy{Style.RESET_ALL}: The Python3 powered {Fore.YELLOW}google{Style.RESET_ALL} dorking and metadata extracting tool. Presented by {Fore.MAGENTA}Jessi{Style.RESET_ALL}.')
+parser = argparse.ArgumentParser(description=f'{RED}{BRIGHT}extraMetaPy{RST}: The Python3 powered {YELLOW}google{RST} dorking and metadata extracting tool. Presented by {PINK}Jessi{RST}.')
 
-parser.add_argument('-d', '--domain', help=f'Target domain {Fore.RED}{Style.BRIGHT}REQUIRED{Style.RESET_ALL} {Style.DIM}(Unless -u is supplied){Style.RESET_ALL}', default=None, required=False)
-parser.add_argument('-o', '--output', help=f'Output file name {Style.DIM}OPTIONAL (Defualt: extracted_metadata.txt){Style.RESET_ALL}', default='extracted_metadata.txt', required=False)
-parser.add_argument('-f', '--filedir', help=f'Downloads directory {Style.DIM}OPTIONAL (Default: file_downloads/){Style.RESET_ALL}', default='file_downloads/', required=False)
-parser.add_argument('-l', '--limit', type=int, help=f'Results limit {Style.DIM}OPTIONAL (Default: 100){Style.RESET_ALL}', default=100, required=False)
-parser.add_argument('-u', '--urllist', help=f'URL List (Skips Google Dork task) {Style.DIM}OPTIONAL{Style.RESET_ALL}', default=None, required=False)
-parser.add_argument('-nd', '--nodownload', help=f'Scrape only, skip downloading and metedata extratction {Style.DIM}OPTIONAL (Ex: -nd y){Style.RESET_ALL}', default=None, required=False)
+parser.add_argument('-d', '--domain', help=f'Target domain {RED}{BRIGHT}REQUIRED{RST} {DIM}(Unless -u is supplied){RST}', default=None, required=False)
+parser.add_argument('-o', '--output', help=f'Output file name {DIM}OPTIONAL (Defualt: extracted_metadata.txt){RST}', default='extracted_metadata.txt', required=False)
+parser.add_argument('-f', '--filedir', help=f'Downloads directory {DIM}OPTIONAL (Default: file_downloads/){RST}', default='file_downloads/', required=False)
+parser.add_argument('-l', '--limit', type=int, help=f'Results limit {DIM}OPTIONAL (Default: 100){RST}', default=100, required=False)
+parser.add_argument('-u', '--urllist', help=f'URL List (Skips Google Dork task) {DIM}OPTIONAL{RST}', default=None, required=False)
+parser.add_argument('-nd', '--nodownload', help=f'Scrape only, skip downloading and metedata extratction {DIM}OPTIONAL (Ex: -nd y){RST}', default=None, required=False)
 
 args = parser.parse_args()
 
@@ -36,24 +50,29 @@ limit = args.limit
 urllist = args.urllist
 nodownload = args.nodownload
 
+
+# Create logfile
+timestamp = datetime.now().strftime("%H:%M:%S")
+log = open(f'empy.log', 'a')
+print(f'{CYAN}{BRIGHT}[!] {NORM}{WHITE}Log file: {BRIGHT}empy.log{RST}\n')
+log.write(f'\n[*] Logging started at {timestamp}\n')
+
+
+# Log: URL list or Google Dork mode
+if urllist:
+    log.write(f'{timestamp} Starting job in URL list mode\n')
+else:
+    log.write(f'{timestamp} Starting job in Google Dork mode\n')
+
+
 # Create filedir if not exists
 if not os.path.exists(filedir):
     os.makedirs(filedir)
+    timestamp = datetime.now().strftime("%H:%M:%S")
+    log.write(f"{timestamp} {filedir} doesn't exist, creating\n") # Log - filedir action
 
 
-# Define coloroma colors
-GREEN = Fore.GREEN
-RED = Fore.RED
-WHITE = Fore.WHITE
-CYAN = Fore.CYAN
-PINK = Fore.MAGENTA
-BRIGHT = Style.BRIGHT
-DIM = Style.DIM
-NORM = Style.NORMAL
-RST = Style.RESET_ALL
-
-
-# Display target domain
+# Define target domain
 if not urllist:
     target = domain
 else:
@@ -61,7 +80,15 @@ else:
     urlContent = urlData.readlines()
     urlTarget = urlContent[1]
     target = urlparse(urlTarget).netloc
+
+
+# Display target domain and request info
 print(f'{PINK}{BRIGHT}[*] {NORM}{WHITE}Target domain: {BRIGHT}{target}{RST}')
+print(f'{PINK}{BRIGHT}[*] {NORM}{WHITE}Max results per filetype: {BRIGHT}{limit}{RST}')
+timestamp = datetime.now().strftime("%H:%M:%S")
+log.write(f'{timestamp} Target set as {target}\n') # Log - target identificaiton
+if nodownload:
+    log.write(f'{timestamp} Downloads disabled\n')
 
 
 # Define fileTypes dictionary
@@ -75,25 +102,43 @@ if not urllist:
 
 # Define primary functions
 def dork(domain, ft): # Google Dork function
+    timestamp = datetime.now().strftime("%H:%M:%S")
+    log.write(f'{timestamp} Dorking {domain} for {ft} files\n')
     query = 'site:' + domain + ' filetype:' + ft
     print(f'{GREEN}{BRIGHT}[+] {NORM}{WHITE}Dorking {BRIGHT}{domain}{RST} {WHITE}for {BRIGHT}{ft} {NORM}files{RST}')
     try:
         for result in search(query, num_results=limit):
             f.write(f'{result}\n')
+            timestamp = datetime.now().strftime("%H:%M:%S")
+            log.write(f'{timestamp} Found {ft} file for {domain}\n')
     except:
+        timestamp = datetime.now().strftime("%H:%M:%S")
+        log.write(f'{timestamp} Dork failed for {domain} and {ft} (Too many requests, try again later)\n')
         print(f'{RED}{BRIGHT}[X]{RST} {WHITE}Dork failed for: {BRIGHT}{ft}{RST}')
         print(f'{DIM}Failure is likely due to too many requests...')
         print(f'Try again later\n{RST}')
 
 
 def download_url(url,filename): # Download files function
-    try:
-        r = urllib.request.urlretrieve(url,filename)
-        print(f'{GREEN}{BRIGHT}[+]{NORM} {WHITE}Downloading: {BRIGHT}{url}{RST}')
-    except urllib.error.HTTPError as exception:
-        print(f'{RED}{BRIGHT}[x]{DIM} Download failed for:{RST} {WHITE}{url}{RST}')
-    except urllib.error.ContentTooShortError as exception:
-        print(f'{RED}{BRIGHT}[x]{DIM} Download failed for:{RST} {WHITE}{url}{RST}')
+    for i in range(0,3):
+        try:
+            r = urllib.request.urlretrieve(url,filename)
+            #print(f'{GREEN}{BRIGHT}[+]{NORM} {WHITE}Downloading: {BRIGHT}{url}{RST}')
+        except urllib.error.HTTPError as exception:
+            if i == 2:
+                timestamp = datetime.now().strftime("%H:%M:%S")
+                log.write(f'{timestamp} Download failed for {url} because: {exception}\n')
+                print(f'{RED}{BRIGHT}[x]{DIM} Download failed for:{RST} {WHITE}{url}{RST} ({DIM}{exception}{RST})')
+        except urllib.error.ContentTooShortError as exception:
+            if i == 2:
+                timestamp = datetime.now().strftime("%H:%M:%S")
+                log.write(f'{timestamp} Download failed for {url} because: {exception}\n')
+                print(f'{RED}{BRIGHT}[x]{DIM} Download failed for:{RST} {WHITE}{url}{RST} ({DIM}{exception}{RST})')
+        else:
+            timestamp = datetime.now().strftime("%H:%M:%S")
+            log.write(f'{timestamp} Downloaded {url}\n') # Log - Successful download
+            print(f'{GREEN}{BRIGHT}[+]{NORM} {WHITE}Downloaded: {BRIGHT}{url}{RST}')
+            break
 
 
 class ExifTool(object): # Define ExifTool class
@@ -182,10 +227,20 @@ time.sleep(2)
 o = open(output, 'a')
 with ExifTool() as e:
     for files in dirListing:
+        timestamp = datetime.now().strftime("%H:%M:%S")
+        log.write(f'{timestamp} Extracting metadata for {files}\n') # Log - start mdata extract
         file = filedir + files
         print(f'{GREEN}{BRIGHT}[+] {NORM}{WHITE}Extracting metadata for {BRIGHT}{files}{RST}')
         o.write(f'{RED}{BRIGHT}[*] {NORM}File: {WHITE}{BRIGHT}{files}{RST}\n')
         metadata = e.get_metadata(file)
         o.write(f'{metadata}\n\n')
+        timestamp = datetime.now().strftime("%H:%M:%S")
+        log.write(f'{timestamp} Metadata written for {files}\n') # Log - mdata write
+
+# Close out
 o.close()
+timestamp = datetime.now().strftime("%H:%M:%S")
+log.write(f'[*] Logging stopped at {timestamp}\n') # Log - end
+log.close()
+
 print(f'{GREEN}{BRIGHT}[+] {NORM}{WHITE}Extracted metadata written to {BRIGHT}{output}{RST}')
