@@ -224,7 +224,7 @@ print(f'{GREEN}{BRIGHT}[+] {NORM}{WHITE}Downloaded {BRIGHT}{dirCount}{NORM} file
 # Extract metadata
 print(f'\n{CYAN}{BRIGHT}[!] {NORM}{WHITE}Startig metadata extraction task{RST}')
 time.sleep(2)
-o = open(output, 'a')
+o = open(output, 'w+')
 with ExifTool() as e:
     for files in dirListing:
         timestamp = datetime.now().strftime("%H:%M:%S")
