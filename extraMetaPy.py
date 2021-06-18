@@ -97,7 +97,7 @@ fileTypes = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx']
 
 # Open urls.txt to write scraped urls to
 if not urllist:
-    f = open('urls.txt', 'a')
+    f = open('urls.txt', 'w+')
 
 
 # Define primary functions
