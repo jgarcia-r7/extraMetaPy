@@ -123,6 +123,8 @@ else:
 print(f'{PINK}{BRIGHT}[*] {NORM}{WHITE}Target domain: {BRIGHT}{target}{RST}')
 if not urllist:
     print(f'{PINK}{BRIGHT}[*] {NORM}{WHITE}Max results per filetype: {BRIGHT}{limit}{RST}')
+    totalResults = limit * 7
+    print(f'{PINK}{BRIGHT}[*] {NORM}{WHITE}Max results total: {BRIGHT}{totalResults}{RST}')
 timestamp = datetime.now().strftime("%H:%M:%S")
 log.write(f'{timestamp} Target set as {target}\n') # Log - target identificaiton
 if nodownload:
