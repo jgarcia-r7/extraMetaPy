@@ -3,6 +3,7 @@
 # Author: Jessi
 # Usage: ./extraMetaPy.py -d <domain> -o <output> -f <filedir> -l <results_limit> (Ex: ./extraMetaPy.py -d domain.com -o results.txt -f downloads/ -l 150)
 
+import sys
 import os
 import argparse
 import time
@@ -27,6 +28,13 @@ BRIGHT = Style.BRIGHT
 DIM = Style.DIM
 NORM = Style.NORMAL
 RST = Style.RESET_ALL
+
+
+# Error if no arguments
+if len(sys.argv) <= 1:
+    print(f'{RED}{BRIGHT}Error{DIM}: Either -d (--domain) or -u (--urllist) required{RST}')
+    print(f'{DIM}-h (--help) for usage{RST}')
+    exit(1)
 
 
 # Define parser and arguments.
