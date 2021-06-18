@@ -194,6 +194,9 @@ if not urllist:
     print(f'{GREEN}{BRIGHT}[+] {NORM}{WHITE}Scraped {BRIGHT}{urlsSum}{NORM} URLs{RST}')
     print(f'{GREEN}{BRIGHT}[+] {NORM}{WHITE}Scraped URLs saved in {BRIGHT}urls.txt{RST}')
     if nodownload:
+        timestamp = datetime.now().strftime("%H:%M:%S")
+        log.write(f'[*] Logging stopped at {timestamp}\n') # Log - end
+        log.close()
         exit(1)
 else:
     urlsFile = open(urllist, 'r')
