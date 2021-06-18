@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-# Title: extraMetaPy
+# Title: extraMetaPy: The Python3 powered google dorking and metadata extracting tool.
 # Author: Jessi
 # Usage: ./extraMetaPy.py -d <domain> -o <output> -f <filedir> -l <results_limit> (Ex: ./extraMetaPy.py -d domain.com -o results.txt -f downloads/ -l 150)
+# REQUIRES EXIFTOOL INSTALLED (apt install libimage-exiftool-perl)
 
 import sys
 import os
@@ -30,10 +31,12 @@ NORM = Style.NORMAL
 RST = Style.RESET_ALL
 
 
-# Error if no arguments
+# Error if no arguments and print example
 if len(sys.argv) <= 1:
-    print(f'{RED}{BRIGHT}Error{DIM}: Either -d (--domain) or -u (--urllist) required{RST}')
-    print(f'{DIM}-h (--help) for usage{RST}')
+    print(f'{RED}{BRIGHT}extraMetaPy{RST}: The Python3 powered {YELLOW}google{RST} dorking and metadata extracting tool. Presented by {PINK}Jessi{RST}.\n')
+    print(f'{RED}{BRIGHT}Error{DIM}: Either -d (--domain) or -u (--urllist) required.{RST}')
+    print(f'{PINK}{BRIGHT}Example:{RED} extraMetaPy{NORM}{WHITE} -d domain.com -o domain_meta.txt -f domain_files/ -l 75{RST}\n')
+    print(f'{DIM}-h (--help) to see full usage and arguments.{RST}')
     exit(1)
 
 
