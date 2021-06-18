@@ -2,7 +2,7 @@
 The Python3 powered google dorking and metadata extraction tool.
 
 ### Notes
-extraMetaPy has two main modes: Google Dork mode or URL list mode.
+extraMetaPy has two main modes: Google Dork mode or URL list mode.  
 Google Dork mode: Designated by setting the `-d (--domain)` argument to a valid domain name.
 - In this mode, extraMetaPy will use Google Dorks to scan a domain for common file types, it will then scrape them into a file called 'urls.txt', then it will proceed to download all of the files, unless `-nd y (--nodownload y)` is set, finally, it will extract all of the metadata from the files into an output file.  
 
