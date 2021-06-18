@@ -128,7 +128,8 @@ log.write(f'{timestamp} Target set as {target}\n') # Log - target identificaiton
 if nodownload:
     print(f'{PINK}{BRIGHT}[*] {NORM}{WHITE}Downloads disabled{RST}\n')
     log.write(f'{timestamp} Downloads disabled\n')
-print(f'{PINK}{BRIGHT}[*] {NORM}{WHITE}Downloads enabled{RST}\n')
+else:
+    print(f'{PINK}{BRIGHT}[*] {NORM}{WHITE}Downloads enabled{RST}\n')
 
 
 # Define fileTypes dictionary
