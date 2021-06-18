@@ -13,10 +13,12 @@ Ex: ./extraMetaPy.py -d domain.com -o domain_meta.txt -f domain_files/ -l 150
 
 #### Screenshots  
 **Arguments**  
-![image](https://user-images.githubusercontent.com/81575551/122439035-46b95980-cf69-11eb-8a41-a440be4cd675.png)
+![image](https://user-images.githubusercontent.com/81575551/122490925-04b40600-cfb1-11eb-91ac-d0ebff57da12.png)
 
 **In-Use Example**   
-![image](https://user-images.githubusercontent.com/81575551/122439351-939d3000-cf69-11eb-89fe-d38387eedf72.png)
+![image](https://user-images.githubusercontent.com/81575551/122491101-65dbd980-cfb1-11eb-8c3e-d4595473eef8.png)  
+
+![image](https://user-images.githubusercontent.com/81575551/122491276-adfafc00-cfb1-11eb-9b37-bc8163bf7e9b.png)
 
 **Current Extracted Metadata Format (WIP)**  
 ![image](https://user-images.githubusercontent.com/81575551/122439670-db23bc00-cf69-11eb-85d1-408cce24a6e3.png)
