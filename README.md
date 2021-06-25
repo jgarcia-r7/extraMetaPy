@@ -28,6 +28,9 @@ Ex: ./extraMetaPy.py -d domain.com -o domain_meta.txt -f domain_files/ -l 150
 **Arguments**  
 ![image](https://user-images.githubusercontent.com/81575551/122490925-04b40600-cfb1-11eb-91ac-d0ebff57da12.png)
 
+**In-Use Example (Latest Look) and -nd y**  
+![image](https://user-images.githubusercontent.com/81575551/123434616-af708980-d59a-11eb-839f-d8cbf7f69a8a.png)
+
 **In-Use Example**   
 ![image](https://user-images.githubusercontent.com/81575551/122491101-65dbd980-cfb1-11eb-8c3e-d4595473eef8.png)  
 
