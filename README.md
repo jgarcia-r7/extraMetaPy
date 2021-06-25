@@ -24,6 +24,10 @@ pip3 install -r requirements.txt
 Ex: ./extraMetaPy.py -d domain.com -o domain_meta.txt -f domain_files/ -l 150
 ```
 
+## To-do  
+Beautify/Parse output data for final output file.  
+Parse URLs where metadata was found from the file downloaded, log URL into output file.  
+
 ## Screenshots  
 **Arguments**  
 ![image](https://user-images.githubusercontent.com/81575551/122490925-04b40600-cfb1-11eb-91ac-d0ebff57da12.png)
@@ -37,4 +41,4 @@ Ex: ./extraMetaPy.py -d domain.com -o domain_meta.txt -f domain_files/ -l 150
 ![image](https://user-images.githubusercontent.com/81575551/122491276-adfafc00-cfb1-11eb-9b37-bc8163bf7e9b.png)
 
 **Current Extracted Metadata Format (WIP)**  
-![image](https://user-images.githubusercontent.com/81575551/122439670-db23bc00-cf69-11eb-85d1-408cce24a6e3.png)
+![image](https://user-images.githubusercontent.com/81575551/123436374-8fda6080-d59c-11eb-83d5-3906e196806a.png)
