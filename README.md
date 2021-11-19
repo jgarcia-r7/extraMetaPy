@@ -1,4 +1,11 @@
 # extraMetaPy 2.0
+### Changelog 11/19/21
+- Changed output format to pretty JSON.
+- Added CSV export function.
+- Added socks5 proxy support.
+- Fixed logic error in `-nd` function.  
+
+### Description
 The Python3 powered google dorker and metadata extractor.  
 Use Google Dorks against a target domain to scrape URLs containing common filetypes. Download files from scraped URLs. Extract metadata from files into a pretty JSON output file and formatted CSV file.  
 
@@ -10,7 +17,11 @@ Google Dork mode: Designated by setting the `-d (--domain)` argument to a valid 
 - In this mode, extraMetaPy will use Google Dorks to scan a domain for common file types, it will then scrape them into a file called 'urls.txt', then it will proceed to download all of the files, unless `-nd (--nodownload)` is set, finally, it will extract all of the metadata from the files into an output file.  
 
 URL list mode: Designated by setting the `-u (--urllist)` argument to a valid list of URLs.  
-- In this mode, extraMetaPy will read an existing list of URLs, skipping Google Dorks as a result, then proceed with the standard process of downloading the files and extracting their metadata.  
+- In this mode, extraMetaPy will read an existing list of URLs, skipping Google Dorks as a result, then proceed with the standard process of downloading the files and extracting their metadata. 
+
+### socks5 Proxy Support
+Added on 11/19/21, extraMetaPy can now be used through a socks5 proxy:  
+Using the `-s` parameter and specifying an IP for a socks5 proxy will enable proxy mode and will route all traffic, including the Google dorks and download requests through that proxy. The `-sp` parameter can be used to modify the default port `1080` that socks5 uses.  
 
 Errors?  
 - extraMetaPy creates a log file called `empy.log` by default, it will timestamp relative logs and information into the log, along with exceptions.  
@@ -31,10 +42,14 @@ Ex: extraMetaPy -d yahoo.com -o yahoo_meta.json -f files/ -l 50
 
 #### Screenshots  
 Installing:  
-![image](https://user-images.githubusercontent.com/28818635/142551732-86bb11f8-03e1-4f7e-b169-c0b554da2fe4.png)
+![image](https://user-images.githubusercontent.com/28818635/142633168-c816f209-3bad-4402-bf3b-fff55b08cd11.png)  
  
- Example: Google Dork mode  
-![image](https://user-images.githubusercontent.com/28818635/142552157-7982b81f-af5f-40af-9738-ba59c9832f80.png)
+ Example: Google Dork mode (w/ socks5 proxy)  
+![image](https://user-images.githubusercontent.com/28818635/142634893-449bea4a-e61b-49cc-8fad-a15928104f29.png)  
 
 Example: URL list mode with errors  
-![image](https://user-images.githubusercontent.com/28818635/142552265-4f406018-5417-4ecb-b63e-9870d34b270e.png)
+![image](https://user-images.githubusercontent.com/28818635/142635072-3688762d-1bc3-4e0b-a0b8-21abb8e1aaf1.png)  
+
+Example: JSON output  
+![image](https://user-images.githubusercontent.com/28818635/142635257-be2cb2a0-d98b-4fbf-9a35-ecd55b4da46d.png)  
+
