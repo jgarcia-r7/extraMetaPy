@@ -19,7 +19,7 @@ Errors?
 
 #### Usage
 ```bash
-git clone https://github.com/jessisec/extraMetaPy
+git clone https://github.com/jgarcia-r7/extraMetaPy
 cd extraMetaPy
 chmod +x install.sh
 ./install.sh
