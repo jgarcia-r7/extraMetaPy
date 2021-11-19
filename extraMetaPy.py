@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-# Title: extraMetaPy: The Python3 powered google dorking and metadata extracting tool.
+# Title: extraMetaPy 2.0: The Python3 powered google dorking and metadata extracting tool.
 # Author: Jessi
-# Usage: ./extraMetaPy.py -d <domain> -o <output> -f <filedir> -l <results_limit> (Ex: ./extraMetaPy.py -d domain.com -o results.txt -f downloads/ -l 150)
+# Usage: extraMetaPy -d <domain> -o <output> -f <filedir> -l <results_limit> (Ex: extraMetaPy -d domain.com -o results.json -f downloads/ -l 150)
 # REQUIRES EXIFTOOL INSTALLED (apt install libimage-exiftool-perl)
 
 import sys
@@ -10,7 +10,7 @@ import os
 import argparse
 import time
 import subprocess
-import json
+import simplejson
 import urllib.request
 from googlesearch import search
 import colorama
@@ -36,20 +36,22 @@ RST = Style.RESET_ALL
 if len(sys.argv) <= 1:
     print(f'{RED}{BRIGHT}extraMetaPy{RST}: The Python3 powered {YELLOW}google{RST} dorking and metadata extracting tool. Presented by {PINK}Jessi{RST}.\n')
     print(f'{RED}{BRIGHT}Error{DIM}: Either -d (--domain) or -u (--urllist) required.{RST}')
-    print(f'{PINK}{BRIGHT}Example:{RED} extraMetaPy{NORM}{WHITE} -d domain.com -o domain_meta.txt -f domain_files/ -l 75{RST}\n')
+    print(f'{PINK}{BRIGHT}Example:{RED} extraMetaPy{NORM}{WHITE} -d domain.com -o domain_meta.json -f domain_files/ -l 75{RST}\n')
     print(f'{DIM}-h (--help) to see full usage and arguments.{RST}')
+    print('\n')
+    print(f'{DIM}Version: {RED}{BRIGHT}2.0{RST}')
     exit(1)
 
 
 # Define parser and arguments.
-parser = argparse.ArgumentParser(description=f'{RED}{BRIGHT}extraMetaPy{RST}: The Python3 powered {YELLOW}google{RST} dorking and metadata extracting tool. Presented by {PINK}Jessi{RST}.')
+parser = argparse.ArgumentParser(description=f'{RED}{BRIGHT}extraMetaPy - Version: 2.0{RST}: The Python3 powered {YELLOW}google{RST} dorking and metadata extracting tool. Presented by {PINK}Jessi{RST}.')
 
 parser.add_argument('-d', '--domain', help=f'Target domain {RED}{BRIGHT}REQUIRED{RST} {DIM}(Unless -u is supplied){RST}', default=None, required=False)
-parser.add_argument('-o', '--output', help=f'Output file name {DIM}OPTIONAL (Defualt: extracted_metadata.txt){RST}', default='extracted_metadata.txt', required=False)
+parser.add_argument('-o', '--output', help=f'Output file name {DIM}OPTIONAL (Defualt: extracted_metadata.json){RST}', default='extracted_metadata.json', required=False)
 parser.add_argument('-f', '--filedir', help=f'Downloads directory {DIM}OPTIONAL (Default: file_downloads/){RST}', default='file_downloads/', required=False)
 parser.add_argument('-l', '--limit', type=int, help=f'Results limit {DIM}OPTIONAL (Default: 100){RST}', default=100, required=False)
 parser.add_argument('-u', '--urllist', help=f'URL List (Skips Google Dork task) {DIM}OPTIONAL{RST}', default=None, required=False)
-parser.add_argument('-nd', '--nodownload', help=f'Scrape only, skip downloading and metedata extratction {DIM}OPTIONAL (Ex: -nd y){RST}', default=None, required=False)
+parser.add_argument('-nd', '--nodownload', help=f'Scrape only, skip downloading and metedata extratction {DIM}OPTIONAL (Ex: -nd){RST}', action='store_true', default=False, required=False)
 
 args = parser.parse_args()
 
@@ -162,6 +164,9 @@ def dork(domain, ft): # Google Dork function
 
 
 def download_url(url,filename): # Download files function
+    opener = urllib.request.build_opener()
+    opener.addheaders = [('User-agent', 'Mozilla/5.0')] # Set our download function to use Mozilla user-agent to avoid being blocked.
+    urllib.request.install_opener(opener)
     for i in range(0,3):
         try:
             r = urllib.request.urlretrieve(url,filename)
@@ -176,6 +181,11 @@ def download_url(url,filename): # Download files function
                 timestamp = datetime.now().strftime("%H:%M:%S")
                 log.write(f'{timestamp} Download failed for {url} because: {exception}\n')
                 print(f'{RED}{BRIGHT}[x]{DIM} Download failed for:{RST} {WHITE}{url}{RST} ({DIM}{exception}{RST})')
+        except:
+            if i == 2:
+                timestamp = datetime.now().strftime("%H:%M:%S")
+                log.write(f'{timestamp} Download failed for {url} because: Unknown\n')
+                print(f'{RED}{BRIGHT}[x]{DIM} Download failed for:{RST} {WHITE}{url}{RST} ({DIM}Unknown error{RST})')
         else:
             timestamp = datetime.now().strftime("%H:%M:%S")
             log.write(f'{timestamp} Downloaded {url}\n') # Log - Successful download
@@ -211,9 +221,9 @@ class ExifTool(object): # Define ExifTool class
             output += os.read(fd, 4096).decode('utf-8')
         return output[:-len(self.sentinel)]
 
-    def get_metadata(self, file):
-        return json.loads(self.execute("-Author", "-Creator", "-LastModifiedBy", "-J", file))
-
+    def get_metadata(self, filedir):
+        #return self.execute("-Author", "-Creator", "-LastModifiedBy", file)
+        o.write(simplejson.dumps(simplejson.loads(self.execute("-Author", "-Creator", "-LastModifiedBy", "-J", filedir)), indent=4, sort_keys=True))
 
 # Begin Google Dork task
 if not urllist:
@@ -222,7 +232,7 @@ if not urllist:
     for ft in fileTypes:
         dork(domain,ft)
 else:
-    print(f'{GREEN}{BRIGHT}[+] {NORM}{WHITE}URL list supplied {BRIGHT}{urllist}{RST}')
+    print(f'{GREEN}{BRIGHT}[+] {NORM}{WHITE}URL list supplied: {BRIGHT}{urllist}{RST}')
     print(f'{CYAN}{BRIGHT}[!] {NORM}{WHITE}Skipping Google Dork task{RST}')
     time.sleep(2)
 
@@ -278,22 +288,46 @@ print(f'\n{CYAN}{BRIGHT}[!] {NORM}{WHITE}Startig metadata extraction task{RST}')
 time.sleep(2)
 o = open(output, 'w+')
 with ExifTool() as e:
-    for files in dirListing:
-        timestamp = datetime.now().strftime("%H:%M:%S")
-        log.write(f'{timestamp} Extracting metadata for {files}\n') # Log - start mdata extract
-        file = filedir + files
-        print(f'{GREEN}{BRIGHT}[+] {NORM}{WHITE}Extracting metadata for {BRIGHT}{files}{RST}')
-        o.write(f'{RED}{BRIGHT}[*] {NORM}File: {WHITE}{BRIGHT}{files}{RST}\n')
-        metadata = e.get_metadata(file)
-        o.write(f'{metadata}\n\n')
-        timestamp = datetime.now().strftime("%H:%M:%S")
-        log.write(f'{timestamp} Metadata written for {files}\n') # Log - mdata write
+    timestamp = datetime.now().strftime("%H:%M:%S")
+    log.write(f'{timestamp} Extracting metadata for {dirCount} files\n') # Log - start mdata extract
+    #file = filedir + files
+    print(f'{GREEN}{BRIGHT}[+] {NORM}{WHITE}Extracting metadata for {BRIGHT}{dirCount}{NORM} files{RST}')
+    #o.write(f'{RED}{BRIGHT}[*] {NORM}File: {WHITE}{BRIGHT}{files}{RST}\n')
+    e.get_metadata(filedir)
+    #o.write(f'{metadata}\n\n')
+    #o.write(f'{GREEN}{BRIGHT}[+] {NORM}{WHITE}Extracting metadata for {BRIGHT}{files}{RST} | {metadata}\n\n')
+    timestamp = datetime.now().strftime("%H:%M:%S")
+    log.write(f'{timestamp} Metadata written for {dirCount} files\n') # Log - mdata write
 
 
-# Close out
+# Close out output file
 o.close()
+
+
+# Remove filedir from output file
+os.system(f"sed -i 's/{filedir}/' {output}")
+
+
+# Prettify JSON output and display it in terminal
+print('\n')
+print(f'{CYAN}{BRIGHT}[!] {NORM}{WHITE}Prettifying JSON{RST}')
+time.sleep(2)
+print(f'{GREEN}{BRIGHT}[+] {NORM}{WHITE}Extracted metadata results: {RST}')
+os.system(f"cat {output} | jq")
+
+
+# Output to CSV file
+print('\n')
+print(f'{CYAN}{BRIGHT}[!] {NORM}{WHITE}Creating CSV file for results {RST}')
+os.system(f"cat {output} | jq -r '(map(keys) | add | unique) as $cols | map(. as $row | $cols | map($row[.])) as $rows | $cols, $rows[] | @csv' > {output}.csv")
+os.system("""awk -F ',' '{print $4,$3,$2,$1}' """ + output +""".csv | sed 's/"//g' | sed 's/ /,/g' > tmp && mv tmp """+ output +""".csv""")
+print(f'{GREEN}{BRIGHT}[+] {NORM}{WHITE}CSV file written{RST}')
+
+
+# Close task
 timestamp = datetime.now().strftime("%H:%M:%S")
 log.write(f'[*] Logging stopped at {timestamp}\n') # Log - end
 log.close()
 
-print(f'{GREEN}{BRIGHT}[+] {NORM}{WHITE}Extracted metadata written to {BRIGHT}{output}{RST}')
+print(f'{GREEN}{BRIGHT}[+] JSON {NORM}{WHITE}Extracted metadata written to {BRIGHT}{output}{RST}')
+print(f'{GREEN}{BRIGHT}[+] CSV {NORM}{WHITE}Extracted metadata written to {BRIGHT}{output}.csv{RST}')
