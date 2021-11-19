@@ -4,7 +4,17 @@
 - Added CSV export function.
 - Added socks5 proxy support.
 - Fixed logic error in `-nd` function.  
-
+### Requirements Error  
+If you get the following error:
+```bash
+ERROR: Could not find a version that satisfies the requirement python_apt==2.3.0+b1 (from versions: 0.0.0, 0.7.8)
+ERROR: No matching distribution found for python_apt==2.3.0+b1
+```
+Try installing the 'python_apt' package manually:  
+```bash
+pip3 install python_apt
+```
+  
 ### Description
 The Python3 powered google dorker and metadata extractor.  
 Use Google Dorks against a target domain to scrape URLs containing common filetypes. Download files from scraped URLs. Extract metadata from files into a pretty JSON output file and formatted CSV file.  
