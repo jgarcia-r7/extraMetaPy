@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
-# Title: extraMetaPy 2.0: The Python3 powered google dorking and metadata extracting tool.
+# Title: extraMetaPy: The Python3 powered google dorking and metadata extracting tool.
 # Author: Jessi
-# Usage: extraMetaPy -d <domain> -o <output> -f <filedir> -l <results_limit> (Ex: extraMetaPy -d domain.com -o results.json -f downloads/ -l 150)
+# Usage: extraMetaPy -d <domain> -o <output> -f <filedir> -l <results_limit> (Ex: ./extraMetaPy -d domain.com -o results.json -f downloads/ -l 150)
 # REQUIRES EXIFTOOL INSTALLED (apt install libimage-exiftool-perl)
 
 import sys
 import apt
 import os
+import socks
+import socket
 import argparse
 import time
 import subprocess
@@ -52,6 +54,8 @@ parser.add_argument('-f', '--filedir', help=f'Downloads directory {DIM}OPTIONAL 
 parser.add_argument('-l', '--limit', type=int, help=f'Results limit {DIM}OPTIONAL (Default: 100){RST}', default=100, required=False)
 parser.add_argument('-u', '--urllist', help=f'URL List (Skips Google Dork task) {DIM}OPTIONAL{RST}', default=None, required=False)
 parser.add_argument('-nd', '--nodownload', help=f'Scrape only, skip downloading and metedata extratction {DIM}OPTIONAL (Ex: -nd){RST}', action='store_true', default=False, required=False)
+parser.add_argument('-s', '--socks', help=f'Proxy requests through socks5 proxy {DIM}OPTIONAL (Ex: -s 127.0.0.1){RST}', default=None, required=False)
+parser.add_argument('-sp', '--socks_port', help=f'Socks5 proxy port {DIM}OPTIONAL (Ex: -sp 1080 | Default: 1080){RST}', default=1080, type=int, required=False)
 
 args = parser.parse_args()
 
@@ -63,6 +67,14 @@ filedir = args.filedir
 limit = args.limit
 urllist = args.urllist
 nodownload = args.nodownload
+SOCKS_IP = args.socks
+SOCKS_PORT = args.socks_port
+
+
+# Socks5 Proxy Settings
+if SOCKS_IP:
+    socks.set_default_proxy(socks.SOCKS5, SOCKS_IP, SOCKS_PORT)
+    socket.socket = socks.socksocket
 
 
 # Check for exiftool installed
@@ -129,10 +141,15 @@ if not urllist:
 timestamp = datetime.now().strftime("%H:%M:%S")
 log.write(f'{timestamp} Target set as {target}\n') # Log - target identificaiton
 if nodownload:
-    print(f'{PINK}{BRIGHT}[*] {NORM}{WHITE}Downloads disabled{RST}\n')
-    log.write(f'{timestamp} Downloads disabled\n')
+    print(f'{PINK}{BRIGHT}[*] {NORM}{WHITE}Downloads disabled{RST}')
+    log.write(f'{timestamp} Downloads disabled')
 else:
-    print(f'{PINK}{BRIGHT}[*] {NORM}{WHITE}Downloads enabled{RST}\n')
+    print(f'{PINK}{BRIGHT}[*] {NORM}{WHITE}Downloads enabled{RST}')
+if not SOCKS_IP:
+    print(f'{PINK}{BRIGHT}[*] {NORM}{WHITE}socks5 proxy disabled{RST}\n')
+else:
+    print(f'{PINK}{BRIGHT}[*] {NORM}{WHITE}socks5 proxy enabled: {DIM} socks5://{SOCKS_IP}:{SOCKS_PORT}{RST}\n')
+    log.write(f'{timestamp} socks5 proxy enabled')
 
 
 # Define fileTypes dictionary
