@@ -10,7 +10,7 @@ NC='\033[0m' # No Color
 
 # Give execution permission to extraMetaPy.py and copy to /usr/bin
 echo -e ${RED}[*] ${WHITE}Installing extraMetaPy 2.0...${NC}
-pip3 install -r requirements.txt
+pip3 install PySocks colorama googlesearch_python python_apt simplejson
 chmod +x extraMetaPy.py
 cp extraMetaPy.py /usr/bin/extraMetaPy
 echo -e ${NC}
