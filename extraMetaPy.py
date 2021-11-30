@@ -15,13 +15,12 @@ import subprocess
 import simplejson
 import urllib.request
 from googlesearch import search
-import colorama
 from colorama import Fore, Style
 from urllib.parse import urlparse
 from datetime import datetime
 
 
-# Define colorama colors
+# Define colorama colors.
 GREEN = Fore.GREEN
 RED = Fore.RED
 WHITE = Fore.WHITE
@@ -34,7 +33,7 @@ NORM = Style.NORMAL
 RST = Style.RESET_ALL
 
 
-# Error if no arguments and print example
+# Error if no arguments and print example.
 if len(sys.argv) <= 1:
     print(f'{RED}{BRIGHT}extraMetaPy{RST}: The Python3 powered {YELLOW}google{RST} dorking and metadata extracting tool. Presented by {PINK}Jessi{RST}.\n')
     print(f'{RED}{BRIGHT}Error{DIM}: Either -d (--domain) or -u (--urllist) required.{RST}')
@@ -60,24 +59,24 @@ parser.add_argument('-sp', '--socks_port', help=f'Socks5 proxy port {DIM}OPTIONA
 args = parser.parse_args()
 
 
-# Set args to variables
+# Set args to variables.
 domain = args.domain
 output = args.output
 filedir = args.filedir
 limit = args.limit
 urllist = args.urllist
 nodownload = args.nodownload
-SOCKS_IP = args.socks
-SOCKS_PORT = args.socks_port
+socks_ip = args.socks
+socks_port = args.socks_port
 
 
-# Socks5 Proxy Settings
-if SOCKS_IP:
-    socks.set_default_proxy(socks.SOCKS5, SOCKS_IP, SOCKS_PORT)
+# Connect to socks5 proxy if true.
+if socks_ip:
+    socks.set_default_proxy(socks.SOCKS5, socks_ip, socks_port)
     socket.socket = socks.socksocket
 
 
-# Check for exiftool installed
+# Check if 'libimage-exiftool-perl' is installed on the system.
 cache = apt.Cache()
 pkg = cache['libimage-exiftool-perl']
 if not pkg.is_installed:
@@ -98,45 +97,44 @@ if not pkg.is_installed:
             exit(1)
 
 
-# Create logfile
+# Create logfile 'empy.log'.
 timestamp = datetime.now().strftime("%H:%M:%S")
 log = open(f'empy.log', 'a')
 print(f'{CYAN}{BRIGHT}[!] {NORM}{WHITE}Log file: {BRIGHT}empy.log{RST}\n')
 log.write(f'\n[*] Logging started at {timestamp}\n')
 
 
-# Log: URL list or Google Dork mode
+# Log: URL list or Google Dork mode.
 if urllist:
     log.write(f'{timestamp} Starting job in URL list mode\n')
 else:
     log.write(f'{timestamp} Starting job in Google Dork mode\n')
 
 
-# Create filedir if not exists
+# Create filedir if not exists.
 if not os.path.exists(filedir):
     os.makedirs(filedir)
     timestamp = datetime.now().strftime("%H:%M:%S")
-    log.write(f"{timestamp} {filedir} doesn't exist, creating\n") # Log - filedir action
+    log.write(f"{timestamp} {filedir} doesn't exist, creating\n") # Log - filedir action.
 
 
-# Define target domain
-if not urllist:
-    target = domain
-else:
+# Define target domain.
+target = domain
+if urllist:
     urlData = open(urllist, 'r')
     urlContent = urlData.readlines()
-    if not urlContent: # If list is empty
+    if not urlContent: # If list is empty.
         print(f'{RED}{BRIGHT}[X] {RST}{DIM}{urllist} is empty{RST}')
         exit(1)
     urlTarget = urlContent[0]
     target = urlparse(urlTarget).netloc
 
 
-# Display target domain and request info
+# Display target domain and request info.
 print(f'{PINK}{BRIGHT}[*] {NORM}{WHITE}Target domain: {BRIGHT}{target}{RST}')
 if not urllist:
     print(f'{PINK}{BRIGHT}[*] {NORM}{WHITE}Max results per filetype: {BRIGHT}{limit}{RST}')
-    totalResults = limit * 7
+    totalResults = limit * 9
     print(f'{PINK}{BRIGHT}[*] {NORM}{WHITE}Max results total: {BRIGHT}{totalResults}{RST}')
 timestamp = datetime.now().strftime("%H:%M:%S")
 log.write(f'{timestamp} Target set as {target}\n') # Log - target identificaiton
@@ -145,24 +143,24 @@ if nodownload:
     log.write(f'{timestamp} Downloads disabled')
 else:
     print(f'{PINK}{BRIGHT}[*] {NORM}{WHITE}Downloads enabled{RST}')
-if not SOCKS_IP:
+if not socks_ip:
     print(f'{PINK}{BRIGHT}[*] {NORM}{WHITE}socks5 proxy disabled{RST}\n')
 else:
-    print(f'{PINK}{BRIGHT}[*] {NORM}{WHITE}socks5 proxy enabled: {DIM} socks5://{SOCKS_IP}:{SOCKS_PORT}{RST}\n')
+    print(f'{PINK}{BRIGHT}[*] {NORM}{WHITE}socks5 proxy enabled: {DIM} socks5://{socks_ip}:{socks_port}{RST}\n')
     log.write(f'{timestamp} socks5 proxy enabled')
 
 
-# Define fileTypes dictionary
-fileTypes = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx']
+# Define fileTypes dictionary.
+fileTypes = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'pub', 'csv']
 
 
-# Open urls.txt to write scraped urls to
+# Open urls.txt to write scraped urls to it.
 if not urllist:
-    f = open('urls.txt', 'w+')
+    f = open(f'{domain}_urls.txt', 'w+')
 
 
-# Define primary functions
-def dork(domain, ft): # Google Dork function
+# Define primary functions.
+def dork(domain,ft): # Google Dork function.
     timestamp = datetime.now().strftime("%H:%M:%S")
     log.write(f'{timestamp} Dorking {domain} for {ft} files\n')
     query = 'site:' + domain + ' filetype:' + ft
@@ -180,14 +178,13 @@ def dork(domain, ft): # Google Dork function
         print(f'Try again later\n{RST}')
 
 
-def download_url(url,filename): # Download files function
+def download_url(url,filename): # Download files function.
     opener = urllib.request.build_opener()
     opener.addheaders = [('User-agent', 'Mozilla/5.0')] # Set our download function to use Mozilla user-agent to avoid being blocked.
     urllib.request.install_opener(opener)
-    for i in range(0,3):
+    for i in range(0,3): # Try to download the file 3 times.
         try:
             r = urllib.request.urlretrieve(url,filename)
-            #print(f'{GREEN}{BRIGHT}[+]{NORM} {WHITE}Downloading: {BRIGHT}{url}{RST}')
         except urllib.error.HTTPError as exception:
             if i == 2:
                 timestamp = datetime.now().strftime("%H:%M:%S")
@@ -205,12 +202,12 @@ def download_url(url,filename): # Download files function
                 print(f'{RED}{BRIGHT}[x]{DIM} Download failed for:{RST} {WHITE}{url}{RST} ({DIM}Unknown error{RST})')
         else:
             timestamp = datetime.now().strftime("%H:%M:%S")
-            log.write(f'{timestamp} Downloaded {url}\n') # Log - Successful download
+            log.write(f'{timestamp} Downloaded {url}\n') # Log - Successful download.
             print(f'{GREEN}{BRIGHT}[+]{NORM} {WHITE}Downloaded: {BRIGHT}{url}{RST}')
             break
 
 
-class ExifTool(object): # Define ExifTool class
+class ExifTool(object): # Define ExifTool class.
 
     sentinel = "{ready}\n"
 
@@ -239,7 +236,6 @@ class ExifTool(object): # Define ExifTool class
         return output[:-len(self.sentinel)]
 
     def get_metadata(self, filedir):
-        #return self.execute("-Author", "-Creator", "-LastModifiedBy", file)
         o.write(simplejson.dumps(simplejson.loads(self.execute("-Author", "-Creator", "-LastModifiedBy", "-J", filedir)), indent=4, sort_keys=True))
 
 # Begin Google Dork task
@@ -258,31 +254,31 @@ else:
 urlsSum = 0
 if not urllist:
     f.close()
-    urllist = 'urls.txt'
-    with open(urllist) as urls: # Open urllist temporarily to count
+    urllist = f'{domain}_urls.txt'
+    with open(urllist) as urls: # Open urllist temporarily to count.
         for url in urls:
             if url.strip():
                 urlsSum += 1
     print(f'{GREEN}{BRIGHT}[+] {NORM}{WHITE}Scraped {BRIGHT}{urlsSum}{NORM} URLs{RST}')
-    print(f'{GREEN}{BRIGHT}[+] {NORM}{WHITE}Scraped URLs saved in {BRIGHT}urls.txt{RST}')
+    print(f'{GREEN}{BRIGHT}[+] {NORM}{WHITE}Scraped URLs saved in {BRIGHT}{domain}_urls.txt{RST}')
     if nodownload:
         timestamp = datetime.now().strftime("%H:%M:%S")
-        log.write(f'[*] Logging stopped at {timestamp}\n') # Log - end
+        log.write(f'[*] Logging stopped at {timestamp}\n') # Log - end.
         log.close()
         exit(1)
 else:
-    with open(urllist) as urls: # Open urllist temporarily to count
+    with open(urllist) as urls: # Open urllist temporarily to count.
         for url in urls:
             if url.strip():
                 urlsSum += 1
     print(f'{GREEN}{BRIGHT}[+] {NORM}{WHITE}Loaded {BRIGHT}{urlsSum}{NORM} URLs{RST}')
 
 
-# Begin file download task
+# Begin file download task.
 print(f'\n{CYAN}{BRIGHT}[!] {NORM}{WHITE}Starting files download task{RST}')
 time.sleep(2)
 
-with open(urllist) as urls: # Open urllist temporarily to download files
+with open(urllist) as urls: # Open urllist temporarily to download files.
     for i in urls:
         if i.strip():
             url = i.rstrip()
@@ -291,7 +287,7 @@ with open(urllist) as urls: # Open urllist temporarily to download files
             download_url(url,filename)
 
 
-# Count downloaded files
+# Count downloaded files.
 dirCount = 0
 dirListing = os.listdir(filedir)
 for num in dirListing:
@@ -300,32 +296,28 @@ for num in dirListing:
 print(f'{GREEN}{BRIGHT}[+] {NORM}{WHITE}Downloaded {BRIGHT}{dirCount}{NORM} files to {BRIGHT}{filedir}{RST}')
 
 
-# Extract metadata
+# Extract metadata.
 print(f'\n{CYAN}{BRIGHT}[!] {NORM}{WHITE}Startig metadata extraction task{RST}')
 time.sleep(2)
 o = open(output, 'w+')
 with ExifTool() as e:
     timestamp = datetime.now().strftime("%H:%M:%S")
     log.write(f'{timestamp} Extracting metadata for {dirCount} files\n') # Log - start mdata extract
-    #file = filedir + files
     print(f'{GREEN}{BRIGHT}[+] {NORM}{WHITE}Extracting metadata for {BRIGHT}{dirCount}{NORM} files{RST}')
-    #o.write(f'{RED}{BRIGHT}[*] {NORM}File: {WHITE}{BRIGHT}{files}{RST}\n')
     e.get_metadata(filedir)
-    #o.write(f'{metadata}\n\n')
-    #o.write(f'{GREEN}{BRIGHT}[+] {NORM}{WHITE}Extracting metadata for {BRIGHT}{files}{RST} | {metadata}\n\n')
     timestamp = datetime.now().strftime("%H:%M:%S")
     log.write(f'{timestamp} Metadata written for {dirCount} files\n') # Log - mdata write
 
 
-# Close out output file
+# Close out output file.
 o.close()
 
 
-# Remove filedir from output file
+# Remove filedir from output file.
 os.system(f"sed -i 's/{filedir}/' {output}")
 
 
-# Prettify JSON output and display it in terminal
+# Prettify JSON output and display it in terminal.
 print('\n')
 print(f'{CYAN}{BRIGHT}[!] {NORM}{WHITE}Prettifying JSON{RST}')
 time.sleep(2)
@@ -333,7 +325,7 @@ print(f'{GREEN}{BRIGHT}[+] {NORM}{WHITE}Extracted metadata results: {RST}')
 os.system(f"cat {output} | jq")
 
 
-# Output to CSV file
+# Output to CSV file.
 print('\n')
 print(f'{CYAN}{BRIGHT}[!] {NORM}{WHITE}Creating CSV file for results {RST}')
 os.system(f"cat {output} | jq -r '(map(keys) | add | unique) as $cols | map(. as $row | $cols | map($row[.])) as $rows | $cols, $rows[] | @csv' > {output}.csv")
@@ -341,7 +333,7 @@ os.system("""awk -F ',' '{print $4,$3,$2,$1}' """ + output +""".csv | sed 's/"//
 print(f'{GREEN}{BRIGHT}[+] {NORM}{WHITE}CSV file written{RST}')
 
 
-# Close task
+# Close task.
 timestamp = datetime.now().strftime("%H:%M:%S")
 log.write(f'[*] Logging stopped at {timestamp}\n') # Log - end
 log.close()
