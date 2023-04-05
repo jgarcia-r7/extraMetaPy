@@ -10,7 +10,17 @@ NC='\033[0m' # No Color
 
 # Give execution permission to extraMetaPy.py and copy to /usr/bin
 echo -e ${RED}[*] ${WHITE}Installing extraMetaPy 2.0...${NC}
-pip3 install PySocks colorama googlesearch_python python_apt simplejson
+pip install PySocks colorama googlesearch_python simplejson
+
+# need the libimage-exiftool-perl
+REQUIRED_PKG="libimage-exiftool-perl"
+PKG_OK=$(dpkg-query -W --showformat='${Status}\n' $REQUIRED_PKG|grep "install ok installed")
+echo Checking for $REQUIRED_PKG: $PKG_OK
+if [ "" = "$PKG_OK" ]; then
+  echo "No $REQUIRED_PKG. Setting up $REQUIRED_PKG."
+  sudo apt-get --yes install $REQUIRED_PKG
+fi
+
 chmod +x extraMetaPy.py
 cp extraMetaPy.py /usr/bin/extraMetaPy
 echo -e ${NC}
@@ -18,4 +28,4 @@ echo -e ${GREEN}[+] ${WHITE}Done!${NC}
 echo -e
 
 # Execute and display it
-extraMetaPy -h
+./extraMetaPy.py -h

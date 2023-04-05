@@ -5,7 +5,6 @@
 # REQUIRES EXIFTOOL INSTALLED (apt install libimage-exiftool-perl)
 
 import sys
-import apt
 import os
 import socks
 import socket
@@ -14,6 +13,7 @@ import time
 import subprocess
 import simplejson
 import urllib.request
+import shutil
 from googlesearch import search
 from colorama import Fore, Style
 from urllib.parse import urlparse
@@ -69,7 +69,6 @@ nodownload = args.nodownload
 socks_ip = args.socks
 socks_port = args.socks_port
 
-
 # Connect to socks5 proxy if true.
 if socks_ip:
     socks.set_default_proxy(socks.SOCKS5, socks_ip, socks_port)
@@ -77,25 +76,10 @@ if socks_ip:
 
 
 # Check if 'libimage-exiftool-perl' is installed on the system.
-cache = apt.Cache()
-pkg = cache['libimage-exiftool-perl']
-if not pkg.is_installed:
-    if not nodownload:
-        print(f'{RED}{BRIGHT}[X] {WHITE}exiftool{NORM} is not installed')
-        exifInstall = input(f'Install {BRIGHT}exiftool{NORM}? (y/n){RST} ')
-        if exifInstall == 'y':
-            pkg.mark_install()
-            try:
-                cache.commit()
-                print(f'{GREEN}{BRIGHT}[+] {WHITE}exiftool{NORM} installed, continuing')
-                time.sleep(2)
-            except:
-                print(f'{RED}{BRIGHT}[X] {RST}{DIM}Failed to install {RST}{BRIGHT}exiftool{DIM}, try manually{RST}')
-                exit(1)
-        else:
-            print(f'{BRIGHT}Google Dork mode{DIM} requires{RST} {BRIGHT}exiftool{DIM} installed')
-            exit(1)
-
+pkg = shutil.which("libimage-exiftool-perl")
+if pkg is None:
+    print(f'{RED}{BRIGHT}[X] {WHITE}exiftool{NORM} is not installed')
+    sys.exit()
 
 # Create logfile 'empy.log'.
 timestamp = datetime.now().strftime("%H:%M:%S")
